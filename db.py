@@ -82,10 +82,22 @@ def create_block(name, max_sum, percent, years):
     db.commit()
     return b
 
+def update_block(name, max_sum, percent, years):
+    b = db.query(Block).filter_by(name=name).first()
+    b.name = name
+    b.max_sum = max_sum
+    b.percent = percent
+    b.years = years
+    db.commit()
+    return b
+
 # add filter to block
 def add_filter_to_block(filter_id, block_id):
-    fb = FilterBlock(filter_id=filter_id, block_id=block_id)
-    db.add(fb)
+    # if relation already exists, do nothing
+    fb = db.query(FilterBlock).filter_by(filter_id=filter_id, block_id=block_id).first()
+    if fb is None:
+        fb = FilterBlock(filter_id=filter_id, block_id=block_id)
+        db.add(fb)
     db.commit()
 
 # delete filter from block

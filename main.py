@@ -44,6 +44,16 @@ class Mortgage(Resource):
             f = db.create_filter(field_json['name'], field_json['operation'], field_json['value'])
             db.add_filter_to_block(f.id, b.id)
         return make_response(jsonify({'status': 'ok'}), 200)
+    
+    def put(self):
+        block_json = request.json
+        mortgage = block_json['mortgage']
+        b = db.update_block(mortgage['name'], mortgage['maxSum'], mortgage['percent'], mortgage['years'])
+        for field_json in block_json['strategy']:
+            # check if field exists
+            f = db.create_filter(field_json['name'], field_json['operation'], field_json['value'])
+            db.add_filter_to_block(f.id, b.id)
+        return make_response(jsonify({'status': 'ok'}), 200)
 
 class Blocks(Resource):
     #@app.route('/api/mortgage', methods=['POST'])

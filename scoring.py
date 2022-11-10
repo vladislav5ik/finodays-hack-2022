@@ -2,6 +2,7 @@ from db import Filter
 import re
 
 def score(filters, filter_values):
+    """Проверка критериев заявки на продукт банка, возвращает результат проверки true/false и причину в случае отказа"""
     result = True
     for filter in filters:
         value = filter_values[filter.id]
@@ -26,7 +27,7 @@ def score(filters, filter_values):
         return (True, 'Все фильтры пройдены.')
 
 def apply_formula(target_filter, all_filters, filter_values):
-    # find MIN MAX formula containing names of filters (e.g. MIN(roi, term))
+    """При наличии формулы в поле, вычисляет значение формулы и возвращает результат"""
     m = re.search(r'(?P<operation>MIN|MAX)\((?P<filters>(\w+,?)+)\)', target_filter.name)
     if m is None:
         return filter_values[target_filter.id]
@@ -34,15 +35,11 @@ def apply_formula(target_filter, all_filters, filter_values):
     operation = m.group('operation')
     filters_in_formula = m.group('filters').split(',')
     
-    # print(', '.join(filters_in_formula))
-
     # find values of filters
     for filter in all_filters:
         if filter.name in filters_in_formula:
             filters_in_formula[filters_in_formula.index(filter.name)] = filter_values[filter.id]
-    
-    # print(', '.join(filters_in_formula))
-    
+        
     # apply formula
     if operation == 'MIN':
         result = min(filters_in_formula)
@@ -50,3 +47,8 @@ def apply_formula(target_filter, all_filters, filter_values):
         result = max(filters_in_formula)
 
     return result
+
+
+def calculate_limit(salary, max_limit, credit_request):
+    """Вычисляет лимит кредита по заданным коэффициентам"""
+    return min(salary*1.5, max_limit, credit_request)

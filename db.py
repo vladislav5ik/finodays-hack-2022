@@ -1,4 +1,4 @@
-
+"""ORM, взаимодействия с БД"""
 from sqlalchemy import Column, Integer, String, ForeignKey, Float, Boolean
 from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
@@ -51,13 +51,17 @@ class UserApplication(Base):
     phone = Column(String)
     result = Column(String) # Accept / Reason to decline - hidden field
     accepted = Column(Boolean)
+    salary = Column(Integer)
+    credit_request = Column(Integer)
 
     def to_json(self):
-        return {'id': self.id, 'block_id': self.block_id, 'name': self.name, 'surname': self.surname, 'middle_name': self.middle_name, 'phone': self.phone, 'result': self.result, 'accepted': self.accepted}
+        return {'id': self.id, 'block_id': self.block_id, 'name': self.name, 'surname': self.surname, 'middle_name': self.middle_name, 'phone': self.phone, 'result': self.result, 'accepted': self.accepted, 'salary': self.salary, 'credit_request': self.credit_request}
 
+def get_max_sum_by_block(block_id):
+    return db.query(Block.max_sum).filter_by(id=block_id).first()[0]
 
-def create_user_application(block_id, name, surname, middle_name, phone, result, accepted):
-    ua = UserApplication(block_id=block_id, name=name, surname=surname, middle_name=middle_name, phone=phone, result=result, accepted=accepted)
+def create_user_application(block_id, name, surname, middle_name, phone, result, accepted, salary, credit_request):
+    ua = UserApplication(block_id=block_id, name=name, surname=surname, middle_name=middle_name, phone=phone, result=result, accepted=accepted, salary=salary, credit_request=credit_request)
     db.add(ua)
     db.commit()
     return ua
